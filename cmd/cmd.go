@@ -51,10 +51,15 @@ func Init() {
 
 	switch result {
 	case "Sms":
-		fmt.Println("Not")
+		c := getClient(true)
+		p := getPurchase()
+		helper.SendSms(
+			"Purchase: "+p.name+"\nPrice: "+strconv.Itoa(p.price)+" so'm",
+			c.phoneNumber,
+		)
 	case "Email":
 
-		c := getClient()
+		c := getClient(false)
 		p := getPurchase()
 
 		message := []byte("To: " + c.email + "\r\n" +
@@ -69,7 +74,7 @@ func Init() {
 	}
 }
 
-func getClient() client {
+func getClient(phoneNumber bool) client {
 
 	//Get the id of client
 	ClientIDPrompt := promptui.Prompt{
@@ -83,7 +88,21 @@ func getClient() client {
 		helper.LogError(err.Error())
 		log.Fatal(err.Error())
 	}
+	if phoneNumber {
+		ClientNumber := promptui.Prompt{
+			Label: "Please provide the phoneNumber of the client format: +998998403675",
+		}
 
+		clientNumber, err := ClientNumber.Run()
+		if err != nil {
+			helper.LogError(err.Error())
+			log.Fatal(err.Error())
+		}
+		return client{
+			id:          clientIDD,
+			phoneNumber: clientNumber,
+		}
+	}
 	//Get the email of client
 	ClientEmail := promptui.Prompt{
 		Label: "Please provide the email of the client",
@@ -99,13 +118,14 @@ func getClient() client {
 
 	clientEmail, emailerr := ClientEmail.Run()
 	if emailerr != nil {
-		log.Fatal(err.Error())
+		log.Fatal(emailerr.Error())
 	}
 
 	return client{
 		id:    clientIDD,
 		email: clientEmail,
 	}
+
 }
 
 func getPurchase() purchase {
