@@ -57,8 +57,14 @@ func Init() {
 		c := getClient()
 		p := getPurchase()
 
-		fmt.Println("Client is ", c)
-		fmt.Println("Purchase is ", p)
+		message := []byte("To: " + c.email + "\r\n" +
+			"Subject: Purchase has been accepted!\r\n" +
+			"\r\n" +
+			"Id: " + strconv.Itoa(p.id) + " Total price " + strconv.Itoa(p.price) + " so'm")
+
+		helper.SendEmail([]string{
+			c.email,
+		}, message)
 
 	}
 }
