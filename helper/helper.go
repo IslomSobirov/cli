@@ -12,6 +12,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 //SMSRequestBody struct for sms service
@@ -48,8 +50,13 @@ func CheckEmail(email string) error {
 //SendEmail send mail
 func SendEmail(reciver []string, message []byte) {
 	// Sender data.
-	from := "notifyuseruzcom@gmail.com"
-	password := "thisIsFunToCreate0924"
+	enverr := godotenv.Load(".env")
+	if enverr != nil {
+		LogError(enverr.Error())
+		log.Fatalf("Error loading .env file")
+	}
+	from := os.Getenv("EMAILFROM")
+	password := os.Getenv("EMAILPASSWORD")
 
 	// smtp server configuration.
 	smtpHost := "smtp.gmail.com"
@@ -71,6 +78,11 @@ func SendEmail(reciver []string, message []byte) {
 //SendSms send sms to clients
 func SendSms(message string, phoneNumber string) {
 	phoneNumber = strings.Replace(phoneNumber, "+", "", 1)
+	enverr := godotenv.Load(".env")
+	if enverr != nil {
+		LogError(enverr.Error())
+		log.Fatalf("Error loading .env file")
+	}
 	body := SMSRequestBody{
 		APIKey:    os.Getenv("NEXMO_API_KEY"),
 		APISecret: os.Getenv("NEXMP_API_SECRET"),
